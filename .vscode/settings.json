@@ -1,0 +1,11 @@
+{
+  "cSpell.language": "en, de-de",
+  "cSpell.customDictionaries": {
+    "homepageDict": {
+      "name": "Bita Dictionary",
+      "path": "${workspaceFolder}/.vscode/dictionary.txt",
+      "scope": "workspace",
+      "addWords": true
+    }
+  }
+}
