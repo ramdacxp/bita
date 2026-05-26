@@ -2,6 +2,7 @@
   "name": "bita",
   "type": "module",
   "version": "0.0.1",
+  "license": "MIT",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -12,7 +13,9 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@alpinejs/persist": "^3.15.12",
     "@tailwindcss/vite": "^4.3.0",
+    "alpinejs": "^3.15.12",
     "astro": "^6.3.8",
     "tailwindcss": "^4.3.0"
   }

@@ -6,5 +6,9 @@ Started the [vibe](https://en.wikipedia.org/wiki/Vibe_coding) an 2026-06-26 at t
 
 ## Links
 
+Frameworks and libs used by this project:
+
 * [Astro](https://astro.build/)
 * [Tailwind CSS](https://tailwindcss.com/)
+* [Alpine.js](https://alpinejs.dev/)
+  * [Persist plugin](https://alpinejs.dev/plugins/persist)

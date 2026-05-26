@@ -17,40 +17,75 @@ import '../styles/global.css';
   </head>
   <body class="bg-stone-100 font-sans antialiased">
 
-    <div id="app" class="max-w-md mx-auto flex flex-col min-h-dvh">
+    <div x-data class="max-w-md mx-auto flex flex-col min-h-dvh">
 
       <!-- Header -->
       <header class="bg-orange-500 text-white px-4 pb-4 shadow-lg sticky top-0 z-20" style="padding-top: calc(env(safe-area-inset-top, 0px) + 1rem)">
         <div class="flex items-center justify-between">
           <h1 class="text-2xl font-bold tracking-tight">🛒 Bita</h1>
           <button
-            id="btn-reset"
+            @click="$store.bita.reset()"
             class="text-sm bg-white/20 hover:bg-white/30 active:bg-white/40 px-3 py-1.5 rounded-full transition font-medium"
             title="Alle Häkchen entfernen"
           >
             Reset
           </button>
         </div>
-        <p id="status-text" class="text-orange-100 text-sm mt-1">Lade…</p>
+        <p x-text="$store.bita.status" class="text-orange-100 text-sm mt-1"></p>
       </header>
 
-      <!-- Item list -->
-      <main id="item-list" class="flex-1 px-4 py-3 space-y-2 overflow-y-auto">
-        <!-- rendered by JS -->
-      </main>
-
       <!-- Empty state -->
-      <div id="empty-state" class="hidden flex-1 flex-col items-center justify-center text-stone-400 px-8 text-center">
+      <div
+        x-show="$store.bita.items.length === 0"
+        x-cloak
+        class="flex-1 flex flex-col items-center justify-center text-stone-400 px-8 text-center"
+      >
         <span class="text-7xl mb-5">🛍️</span>
         <p class="text-xl font-semibold text-stone-500">Liste ist leer</p>
         <p class="text-sm mt-1">Füge unten einen Artikel hinzu</p>
       </div>
 
+      <!-- Item list -->
+      <main
+        x-show="$store.bita.items.length > 0"
+        x-cloak
+        class="flex-1 px-4 py-3 space-y-2 overflow-y-auto"
+      >
+        <template x-for="item in $store.bita.sorted" :key="item.id">
+          <div
+            class="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm border border-stone-100 transition-opacity"
+            :class="{ 'opacity-50': item.checked }"
+          >
+            <button
+              @click="$store.bita.toggle(item.id)"
+              class="w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all"
+              :class="item.checked ? 'bg-green-500 border-green-500 text-white text-sm' : 'border-stone-300 hover:border-orange-400'"
+              :aria-label="item.checked ? 'Abhaken rückgängig' : 'Abhaken'"
+            >
+              <span x-show="item.checked">✓</span>
+            </button>
+            <span
+              x-text="item.name"
+              class="flex-1 text-base leading-snug"
+              :class="item.checked ? 'line-through text-stone-400' : 'text-stone-800'"
+            ></span>
+            <button
+              @click="$store.bita.remove(item.id)"
+              class="text-stone-300 hover:text-red-400 active:text-red-600 transition text-2xl leading-none flex-shrink-0 -mr-1"
+              aria-label="Entfernen"
+            >×</button>
+          </div>
+        </template>
+      </main>
+
       <!-- Add item form -->
-      <footer class="border-t border-stone-200 bg-white px-4 py-3 sticky bottom-0 z-20 shadow-[0_-1px_8px_rgba(0,0,0,0.06)]" style="padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem)">
-        <form id="add-form" class="flex gap-2">
+      <footer
+        class="border-t border-stone-200 bg-white px-4 py-3 sticky bottom-0 z-20 shadow-[0_-1px_8px_rgba(0,0,0,0.06)]"
+        style="padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem)"
+      >
+        <form x-data="{ newItem: '' }" @submit.prevent="$store.bita.add(newItem); newItem = ''" class="flex gap-2">
           <input
-            id="item-input"
+            x-model="newItem"
             type="text"
             placeholder="Artikel hinzufügen…"
             autocomplete="off"
@@ -71,145 +106,57 @@ import '../styles/global.css';
     </div>
 
     <script>
-      type Item = {
-        id: string;
-        name: string;
-        checked: boolean;
-        createdAt: number;
-      };
+      import Alpine from 'alpinejs';
+      import persist from '@alpinejs/persist';
 
-      const STORAGE_KEY = 'bita-v1';
+      Alpine.plugin(persist);
 
-      function loadItems(): Item[] {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          return raw ? (JSON.parse(raw) as Item[]) : [];
-        } catch {
-          return [];
-        }
-      }
+      Alpine.store('bita', {
+        items: Alpine.$persist([]).as('bita'),
 
-      function saveItems(items: Item[]): void {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-      }
+        get sorted() {
+          const items = this.items as any[];
+          return [
+            ...items.filter(i => !i.checked),
+            ...items.filter(i => i.checked),
+          ];
+        },
 
-      function escapeHtml(str: string): string {
-        return str
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      }
+        get status(): string {
+          const items = this.items as any[];
+          const total   = items.length;
+          const checked = items.filter(i => i.checked).length;
+          if (total === 0)       return 'Noch nichts auf der Liste';
+          if (checked === total) return 'Alles erledigt – guten Einkauf! 🎉';
+          return `${checked} von ${total} Artikeln im Korb`;
+        },
 
-      // ── State ──────────────────────────────────────────────────────
-      let items: Item[] = loadItems();
+        add(name: string): void {
+          const trimmed = name.trim();
+          if (!trimmed) return;
+          (this.items as any[]).push({
+            id: crypto.randomUUID(),
+            name: trimmed,
+            checked: false,
+            createdAt: Date.now(),
+          });
+        },
 
-      // ── DOM refs ───────────────────────────────────────────────────
-      const itemList   = document.getElementById('item-list')!;
-      const emptyState = document.getElementById('empty-state')!;
-      const addForm    = document.getElementById('add-form') as HTMLFormElement;
-      const itemInput  = document.getElementById('item-input') as HTMLInputElement;
-      const statusText = document.getElementById('status-text')!;
-      const btnReset   = document.getElementById('btn-reset')!;
+        toggle(id: string): void {
+          const item = (this.items as any[]).find(i => i.id === id);
+          if (item) item.checked = !item.checked;
+        },
 
-      // ── Render ─────────────────────────────────────────────────────
-      function updateStatus(): void {
-        const total   = items.length;
-        const checked = items.filter(i => i.checked).length;
-        if (total === 0) {
-          statusText.textContent = 'Noch nichts auf der Liste';
-        } else if (checked === total) {
-          statusText.textContent = `Alles erledigt – guten Einkauf! 🎉`;
-        } else {
-          statusText.textContent = `${checked} von ${total} Artikeln im Korb`;
-        }
-      }
+        remove(id: string): void {
+          this.items = (this.items as any[]).filter(i => i.id !== id);
+        },
 
-      function renderItems(): void {
-        const unchecked = items.filter(i => !i.checked);
-        const checked   = items.filter(i => i.checked);
-        const sorted    = [...unchecked, ...checked];
-
-        const isEmpty = sorted.length === 0;
-        itemList.classList.toggle('hidden', isEmpty);
-        emptyState.classList.toggle('hidden', !isEmpty);
-        emptyState.classList.toggle('flex', !isEmpty);
-
-        itemList.innerHTML = sorted
-          .map(
-            item => `
-            <div
-              class="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm border border-stone-100 transition-opacity ${item.checked ? 'opacity-50' : ''}"
-              data-id="${item.id}"
-            >
-              <button
-                class="btn-check w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
-                  item.checked
-                    ? 'bg-green-500 border-green-500 text-white text-sm'
-                    : 'border-stone-300 hover:border-orange-400'
-                }"
-                aria-label="${item.checked ? 'Abhaken rückgängig' : 'Abgehakt'}"
-              >${item.checked ? '✓' : ''}</button>
-              <span class="flex-1 text-base leading-snug ${item.checked ? 'line-through text-stone-400' : 'text-stone-800'}">${escapeHtml(item.name)}</span>
-              <button
-                class="btn-delete text-stone-300 hover:text-red-400 active:text-red-600 transition text-2xl leading-none flex-shrink-0 -mr-1"
-                aria-label="Entfernen"
-              >×</button>
-            </div>
-          `
-          )
-          .join('');
-
-        updateStatus();
-      }
-
-      // ── Events ─────────────────────────────────────────────────────
-      itemList.addEventListener('click', e => {
-        const target  = e.target as HTMLElement;
-        const itemEl  = target.closest('[data-id]') as HTMLElement | null;
-        if (!itemEl) return;
-        const id = itemEl.dataset.id!;
-
-        if (target.closest('.btn-check')) {
-          items = items.map(item =>
-            item.id === id ? { ...item, checked: !item.checked } : item
-          );
-          saveItems(items);
-          renderItems();
-        } else if (target.closest('.btn-delete')) {
-          items = items.filter(item => item.id !== id);
-          saveItems(items);
-          renderItems();
-        }
+        reset(): void {
+          (this.items as any[]).forEach(i => { i.checked = false; });
+        },
       });
 
-      addForm.addEventListener('submit', e => {
-        e.preventDefault();
-        const name = itemInput.value.trim();
-        if (!name) return;
-        const newItem: Item = {
-          id: crypto.randomUUID(),
-          name,
-          checked: false,
-          createdAt: Date.now(),
-        };
-        items = [...items, newItem];
-        saveItems(items);
-        renderItems();
-        itemInput.value = '';
-        itemInput.focus();
-      });
-
-      btnReset.addEventListener('click', () => {
-        const anyChecked = items.some(i => i.checked);
-        if (!anyChecked) return;
-        items = items.map(item => ({ ...item, checked: false }));
-        saveItems(items);
-        renderItems();
-      });
-
-      // ── Init ───────────────────────────────────────────────────────
-      renderItems();
+      Alpine.start();
     </script>
 
   </body>
