@@ -1,26 +1,33 @@
 ---
-import '../styles/global.css';
+import "../styles/global.css";
 ---
 
 <html lang="de">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <meta name="generator" content={Astro.generator} />
     <title>Bita – Buy it again</title>
     <meta name="description" content="Hosi Einkaufsliste" />
     <meta name="theme-color" content="#f97316" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <meta name="apple-mobile-web-app-title" content="Bita" />
   </head>
   <body class="bg-stone-100 font-sans antialiased">
-
     <div x-data class="max-w-md mx-auto flex flex-col min-h-dvh">
-
       <!-- Header -->
-      <header class="bg-orange-500 text-white px-4 pb-4 shadow-lg sticky top-0 z-20" style="padding-top: calc(env(safe-area-inset-top, 0px) + 1rem)">
+      <header
+        class="bg-orange-500 text-white px-4 pb-4 shadow-lg sticky top-0 z-20"
+        style="padding-top: calc(env(safe-area-inset-top, 0px) + 1rem)"
+      >
         <div class="flex items-center justify-between">
           <h1 class="text-2xl font-bold tracking-tight">🛒 Bita</h1>
           <button
@@ -72,8 +79,8 @@ import '../styles/global.css';
             <button
               @click="$store.bita.remove(item.id)"
               class="text-stone-300 hover:text-red-400 active:text-red-600 transition text-2xl leading-none flex-shrink-0 -mr-1"
-              aria-label="Entfernen"
-            >×</button>
+              aria-label="Entfernen">×</button
+            >
           </div>
         </template>
       </main>
@@ -83,7 +90,11 @@ import '../styles/global.css';
         class="border-t border-stone-200 bg-white px-4 py-3 sticky bottom-0 z-20 shadow-[0_-1px_8px_rgba(0,0,0,0.06)]"
         style="padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem)"
       >
-        <form x-data="{ newItem: '' }" @submit.prevent="$store.bita.add(newItem); newItem = ''" class="flex gap-2">
+        <form
+          x-data="{ newItem: '' }"
+          @submit.prevent="$store.bita.add(newItem); newItem = ''"
+          class="flex gap-2"
+        >
           <input
             x-model="newItem"
             type="text"
@@ -102,39 +113,45 @@ import '../styles/global.css';
           </button>
         </form>
       </footer>
-
     </div>
 
     <script>
-      import Alpine from 'alpinejs';
-      import persist from '@alpinejs/persist';
+      import Alpine from "alpinejs";
+      import persist from "@alpinejs/persist";
+
+      type Item = {
+        id: string;
+        name: string;
+        checked: boolean;
+        createdAt: number;
+      };
 
       Alpine.plugin(persist);
 
-      Alpine.store('bita', {
-        items: Alpine.$persist([]).as('bita'),
+      // Typed const so TypeScript can infer `this` correctly in methods
+      const bitaStore = {
+        items: Alpine.$persist([] as Item[]).as("bita") as unknown as Item[],
 
-        get sorted() {
-          const items = this.items as any[];
+        get sorted(): Item[] {
           return [
-            ...items.filter(i => !i.checked),
-            ...items.filter(i => i.checked),
+            ...this.items.filter((i) => !i.checked),
+            ...this.items.filter((i) => i.checked),
           ];
         },
 
         get status(): string {
-          const items = this.items as any[];
-          const total   = items.length;
-          const checked = items.filter(i => i.checked).length;
-          if (total === 0)       return 'Noch nichts auf der Liste';
-          if (checked === total) return 'Alles erledigt – guten Einkauf! 🎉';
+          const { items } = this;
+          const total = items.length;
+          const checked = items.filter((i) => i.checked).length;
+          if (total === 0) return "Noch nichts auf der Liste";
+          if (checked === total) return "Alles erledigt – guten Einkauf! 🎉";
           return `${checked} von ${total} Artikeln im Korb`;
         },
 
         add(name: string): void {
           const trimmed = name.trim();
           if (!trimmed) return;
-          (this.items as any[]).push({
+          this.items.push({
             id: crypto.randomUUID(),
             name: trimmed,
             checked: false,
@@ -143,21 +160,23 @@ import '../styles/global.css';
         },
 
         toggle(id: string): void {
-          const item = (this.items as any[]).find(i => i.id === id);
+          const item = this.items.find((i) => i.id === id);
           if (item) item.checked = !item.checked;
         },
 
         remove(id: string): void {
-          this.items = (this.items as any[]).filter(i => i.id !== id);
+          this.items = this.items.filter((i) => i.id !== id);
         },
 
         reset(): void {
-          (this.items as any[]).forEach(i => { i.checked = false; });
+          this.items.forEach((i) => {
+            i.checked = false;
+          });
         },
-      });
+      };
 
+      Alpine.store("bita", bitaStore);
       Alpine.start();
     </script>
-
   </body>
 </html>
