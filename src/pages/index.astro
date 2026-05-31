@@ -57,9 +57,10 @@ import "../styles/global.css";
         x-cloak
         class="flex-1 flex flex-col items-center justify-center text-stone-400 px-8 text-center"
       >
-        <span class="text-7xl mb-5">🛍️</span>
-        <p class="text-xl font-semibold text-stone-500">Liste ist leer</p>
-        <p class="text-sm mt-1">Füge unten einen Artikel hinzu</p>
+        <Icon name="mdi:basket-fill" class="w-24 h-24" />
+        <p class="text-xl font-semibold text-stone-500">Your shopping list is empty!</p>
+        <p class="text-sm mt-2">Add your first item below ...</p>
+        <p class="text-sm mt-16">All data is stored on your device only.</p>
       </div>
 
       <!-- Item list -->
@@ -88,11 +89,7 @@ import "../styles/global.css";
               @click="$store.bita.remove(item.id)"
               class="hover:bg-btn-hover active:bg-btn-active text-site-border font-bold w-8 h-8 rounded transition flex items-center justify-center shrink-0 border border-site-border"
             >
-              <Icon
-                name="mdi:trash"
-                title="Remove"
-                class="w-5 h-5"
-              />
+              <Icon name="mdi:trash" title="Remove" class="w-5 h-5" />
             </button>
           </div>
         </template>
@@ -114,11 +111,11 @@ import "../styles/global.css";
             autocomplete="off"
             autocapitalize="sentences"
             spellcheck="false"
-            class="flex-1 border border-form-border rounded px-4 py-3 text-base bg-form-background"
+            class="flex-1 border border-form-border rounded px-4 py-3 text-base bg-form-background outline-0 focus:outline-1 outline-form-border"
           />
           <button
             type="submit"
-            class="bg-btn-background hover:bg-btn-hover active:bg-btn-active text-white font-bold w-12 h-12 rounded transition flex items-center justify-center shrink-0 border border-form-border"
+            class="bg-btn-background hover:bg-btn-hover active:bg-btn-active text-white font-bold w-12 h-12 rounded transition flex items-center justify-center shrink-0 border border-form-border outline-0 focus:outline-1 outline-form-border"
           >
             <Icon
               name="mdi:basket-plus-outline"
