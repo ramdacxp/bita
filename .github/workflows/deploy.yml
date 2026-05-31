@@ -51,13 +51,14 @@ jobs:
         with:
           name: Website
 
-      # https://github.com/marketplace/actions/sftp-upload
+      # https://github.com/marketplace/actions/sftp-deploy
       - name: SFTP Upload
-        uses: Dylan700/sftp-upload-action@latest
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
         with:
           server: ${{ vars.FTP_SERVER }}
           username: ${{ vars.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          uploads: |
-            ./ => ./www/todo/
-          # delete: 'true'
+          local_path: ./
+          remote_path: ./www/todo/
+          sftp_only: true
+          # delete_remote_files: true
