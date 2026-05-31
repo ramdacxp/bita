@@ -19,3 +19,5 @@ Frameworks and libs used by this project:
 * [Tailwind CSS](https://tailwindcss.com/)
 * [Alpine.js](https://alpinejs.dev/)
   * [Persist plugin](https://alpinejs.dev/plugins/persist)
+* [Astro Icon](https://github.com/natemoo-re/astro-icon)
+  * [MDI Icons](https://icon-sets.iconify.design/mdi/?keyword=mdi) (`npm i -D @iconify-json/mdi`)

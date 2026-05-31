@@ -1,3 +1,22 @@
 @import "tailwindcss";
 
+@theme {
+  /* Non app parts left and right */
+  --color-site-background: var(--color-stone-50);
+  --color-site-border: var(--color-stone-300);
+  /* --color-site-border: var(--color-pink-700); */
+
+  /* header and footer */
+  --color-site-menu: var(--color-slate-400);
+
+  /* form elements */
+  --color-form-border: var(--color-slate-800);
+  --color-form-background: var(--color-slate-200);
+
+  --color-btn-background: var(--color-slate-500);
+  --color-btn-hover: var(--color-slate-600);
+  --color-btn-active: var(--color-slate-700);
+}
+
+/* Alpine JS: hide components flicker free */
 [x-cloak] { display: none !important; }
