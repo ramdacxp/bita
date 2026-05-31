@@ -6,6 +6,12 @@ Started the [vibe](https://en.wikipedia.org/wiki/Vibe_coding) on 2026-06-26 at t
 
 ![Screenshot](images/screenshot.png)
 
+## Online demo
+
+[![Deploy Website](https://github.com/ramdacxp/bita/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/ramdacxp/bita/actions/workflows/deploy.yml)
+
+Latest version can be found at: <https://todo.hosix.de/>
+
 ## Getting started
 
 ```cmd
