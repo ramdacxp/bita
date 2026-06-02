@@ -25,7 +25,7 @@ import "../styles/global.css";
         class="bg-site-menu border-y border-site-border text-white px-4 pb-4 sticky top-0 z-20 p-4"
       >
         <div class="flex items-center justify-between">
-          <Icon name="mdi:basket" class="text-white w-5 h-5" />
+          <Icon name="mdi:basket" class="text-form-border w-8 h-8" />
 
           <h1 class="text-2xl font-bold" title="Buy It Again">Bita</h1>
           <div>
@@ -62,29 +62,35 @@ import "../styles/global.css";
       <main
         x-show="$store.bita.items.length > 0"
         x-cloak
-        class="flex-1 px-4 py-3 space-y-2 overflow-y-auto"
+        class="flex-1 space-y-0.5 overflow-y-auto bg-form-background"
       >
         <template x-for="item in $store.bita.sorted" :key="item.id">
           <div
-            class="flex items-center gap-3 bg-site-background rounded px-4 py-3 border border-site-border"
+            class="flex items-center gap-2 bg-site-background p-2"
           >
+            <!-- checkbox -->
             <button
               @click="$store.bita.toggle(item.id)"
-              class="w-7 h-7 rounded-full border shrink-0 flex items-center justify-center transition-all hover:border-form-border hover:bg-site-menu"
-              :class="item.checked ? 'bg-green-800 border-green-900 text-white text-sm' : 'border-site-border'"
+              class="mx-2 w-8 h-8 rounded-full border shrink-0 flex items-center justify-center transition-all hover:border-form-border hover:bg-site-menu"
+              :class="item.checked ? 'bg-btn-background border-form-border' : 'border-site-border'"
             >
-              <span x-show="item.checked">✓</span>
+              <span
+                class="text-white text-sm font-extrabold"
+                x-show="item.checked">✓</span
+              >
             </button>
+            <!-- todo item text -->
             <span
               x-text="item.name"
               class="flex-1 text-base leading-snug"
               :class="item.checked ? 'line-through text-stone-500' : 'text-stone-800'"
             ></span>
+            <!-- remove button -->
             <button
               @click="$store.bita.remove(item.id)"
-              class="hover:bg-btn-hover active:bg-btn-active text-site-border font-bold w-8 h-8 rounded transition flex items-center justify-center shrink-0 border border-site-border"
+              class="hover:bg-btn-hover active:bg-btn-active text-site-border hover:text-rose-500 font-bold w-10 h-10 rounded transition flex items-center justify-center shrink-0 border border-site-border"
             >
-              <Icon name="mdi:trash" title="Remove" class="w-5 h-5" />
+              <Icon name="mdi:trash" title="Remove" class="w-7 h-7" />
             </button>
           </div>
         </template>
