@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import "../styles/global.css";
+import ItemList from "../components/ItemList.astro";
 ---
 
 <html lang="de">
@@ -62,38 +63,27 @@ import "../styles/global.css";
       <main
         x-show="$store.bita.items.length > 0"
         x-cloak
-        class="flex-1 space-y-0.5 overflow-y-auto bg-form-background"
+        class="flex flex-1 flex-row space-x-0.5 overflow-hidden bg-form-background"
       >
-        <template x-for="item in $store.bita.sorted" :key="item.id">
-          <div
-            class="flex items-center gap-2 bg-site-background hover:bg-white p-2"
-          >
-            <!-- checkbox -->
-            <button
-              @click="$store.bita.toggle(item.id)"
-              class="mx-2 w-8 h-8 rounded-full border shrink-0 flex items-center justify-center transition-all hover:border-form-border hover:bg-site-menu"
-              :class="item.checked ? 'bg-btn-background border-form-border' : 'border-site-border'"
-            >
-              <span
-                class="text-white text-sm font-extrabold"
-                x-show="item.checked">✓</span
-              >
-            </button>
-            <!-- todo item text -->
-            <span
-              x-text="item.name"
-              class="flex-1 text-base leading-snug"
-              :class="item.checked ? 'line-through text-stone-500' : 'text-stone-800'"
-            ></span>
-            <!-- remove button -->
-            <button
-              @click="$store.bita.remove(item.id)"
-              class="hover:bg-btn-hover active:bg-btn-active text-site-border hover:text-rose-500 font-bold w-10 h-10 rounded transition flex items-center justify-center shrink-0 border border-site-border"
-            >
-              <Icon name="mdi:trash" title="Remove" class="w-7 h-7" />
-            </button>
-          </div>
-        </template>
+        <!-- Mobile: Sorted (single list only, no headline) -->
+        <ItemList
+          source="$store.bita.sorted"
+          class="flex md:hidden"
+        />
+
+        <!-- Desktop: Pending (left) -->
+        <ItemList
+          headline="Pending"
+          source="$store.bita.pending"
+          class="hidden md:flex"
+        />
+
+        <!-- Desktop: Done (right) -->
+        <ItemList
+          headline="Done"
+          source="$store.bita.done"
+          class="hidden md:flex"
+        />
       </main>
 
       <!-- Add item form -->
@@ -150,6 +140,14 @@ import "../styles/global.css";
             ...this.items.filter((i) => !i.checked),
             ...this.items.filter((i) => i.checked),
           ];
+        },
+
+        get pending(): Item[] {
+          return this.items.filter((i) => !i.checked);
+        },
+
+        get done(): Item[] {
+          return this.items.filter((i) => i.checked);
         },
 
         get numTotal(): number {

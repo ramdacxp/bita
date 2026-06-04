@@ -1,0 +1,68 @@
+---
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  /** Optional headline */
+  headline?: string;
+  /** Alpine JS expression for the items array, e.g. "$store.bita.pending" */
+  source: string;
+  /** Additional CSS classes */
+  class?: string;
+  /** Any other additional properties are applied to toplevel element */
+  [key: string]: any;
+}
+
+const {
+  headline,
+  source,
+  class: additionalClasses,
+  ...additionalProps
+} = Astro.props;
+---
+
+<div
+  class:list={["flex-1 flex flex-col min-h-0", additionalClasses]}
+  {...additionalProps}
+>
+  <!-- headline -->
+  {
+    headline && (
+      <div class="px-4 py-2 bg-form-background text-sm font-semibold text-stone-500">
+        {headline}
+      </div>
+    )
+  }
+
+  <!-- item list -->
+  <div class="overflow-y-auto space-y-0.5">
+    <template x-for={`item in ${source}`} :key="item.id">
+      <div
+        class="flex items-center gap-2 bg-site-background hover:bg-white p-2"
+      >
+        <!-- checkbox -->
+        <button
+          @click="$store.bita.toggle(item.id)"
+          class="mx-2 w-8 h-8 rounded-full border shrink-0 flex items-center justify-center transition-all hover:border-form-border hover:bg-site-menu"
+          :class="item.checked ? 'bg-btn-background border-form-border' : 'border-site-border'"
+        >
+          <span class="text-white text-sm font-extrabold" x-show="item.checked"
+            >✓</span
+          >
+        </button>
+        <!-- item text -->
+        <span
+          x-text="item.name"
+          class="flex-1 text-base leading-snug"
+          :class="item.checked ? 'line-through text-stone-500' : 'text-stone-800'"
+        ></span>
+        <!-- remove button -->
+        <button
+          @click="$store.bita.remove(item.id)"
+          class="hover:bg-btn-hover active:bg-btn-active text-site-border hover:text-rose-500 font-bold w-10 h-10 rounded transition flex items-center justify-center shrink-0 border border-site-border"
+        >
+          <Icon name="mdi:trash" title="Remove" class="w-7 h-7" />
+        </button>
+      </div>
+    </template>
+  </div>
+</div>
