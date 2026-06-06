@@ -3,3 +3,4 @@ bita
 Bita
 Hoser
 Hosi
+tailwindcss

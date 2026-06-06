@@ -19,4 +19,6 @@
 }
 
 /* Alpine JS: hide components flicker free */
-[x-cloak] { display: none !important; }
+[x-cloak] {
+  display: none !important;
+}

@@ -1,4 +1,7 @@
 {
+  // supress CSS error for Tailwind @theme
+  "css.lint.unknownAtRules": "ignore",
+  // spell checker
   "cSpell.language": "en, de-de",
   "cSpell.customDictionaries": {
     "homepageDict": {
